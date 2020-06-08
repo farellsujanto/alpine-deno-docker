@@ -17,7 +17,19 @@ RUN addgroup -g 1993 -S deno \
  && chown deno:deno /deno-dir/
 
 ENV DENO_DIR /deno-dir/
+ENTRYPOINT ["deno"]
 
+EXPOSE 1993
 
-ENTRYPOINT ["denoz"]
-CMD ["run", "https://deno.land/std/examples/welcome.ts"]
+WORKDIR /app
+
+USER deno
+
+COPY deps.ts .
+RUN deno cache deps.ts
+
+COPY main.ts .
+ADD . .
+RUN deno cache main.ts
+
+CMD ["run", "--allow-net", "main.ts"]
